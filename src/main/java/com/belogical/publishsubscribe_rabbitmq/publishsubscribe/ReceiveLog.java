@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class ReceiveLog {
   private static final String EXCHANGE_NAME = "logs";
-
+static int nbMessage=0;
   public static void main(String[] argv) throws Exception {
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost("localhost");
@@ -24,6 +24,8 @@ public class ReceiveLog {
                                  AMQP.BasicProperties properties, byte[] body) throws IOException {
         String message = new String(body, "UTF-8");
         System.out.println(" [x] Received '" + message + "'");
+        nbMessage++;
+          System.out.println(nbMessage);
       }
     };
     channel.basicConsume(queueName, true, consumer);

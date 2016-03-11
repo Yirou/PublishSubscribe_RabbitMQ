@@ -4,7 +4,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
 
 public class EmitLog {
-
+  
   private static final String EXCHANGE_NAME = "logs";
 
   public static void main(String[] argv) throws Exception {
@@ -18,7 +18,7 @@ public class EmitLog {
 
     channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
     System.out.println(" [x] Sent '" + message + "'");
-
+      System.out.println(ReceiveLog.nbMessage);
     channel.close();
     connection.close();
   }

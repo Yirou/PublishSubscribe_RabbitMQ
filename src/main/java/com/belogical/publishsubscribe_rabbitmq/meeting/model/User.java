@@ -6,98 +6,180 @@
 package com.belogical.publishsubscribe_rabbitmq.meeting.model;
 
 import com.belogical.publishsubscribe_rabbitmq.meeting.Manager;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author yirou
  */
 public class User {
-    
+
     private int id;
     private String name;
-    List<String> messages = new ArrayList<>();
-    List<Groupe> abonnes = new ArrayList<>();
+    private List<String> messages = new ArrayList<>();
+    private List<Groupe> abonnes = new ArrayList<>();
     private Consumer consumer;
     private boolean online;
-    Connection connection;
-    Channel channel;
-    
+    private Connection connection;
+    private Channel channel;
+    private Groupe currentGroupe;
+
     public User(int id, String name) {
         this.id = id;
         this.name = name;
-        init();
+
     }
-    
+
     public User(String name) {
         this.name = name;
     }
-    
+
     public int getId() {
         return id;
     }
-    
+
+    public void setCurrentGroupe(Groupe currentGroupe) {
+        this.currentGroupe = currentGroupe;
+    }
+
+    public Groupe getCurrentGroupe() {
+        return currentGroupe;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
     public List<String> getMessages() {
         return messages;
     }
-    
+
     public void setMessages(List<String> messages) {
         this.messages = messages;
     }
-    
+
     public List<Groupe> getAbonnes() {
         return abonnes;
     }
-    
+
+    public Consumer getConsumer() {
+        return consumer;
+    }
+
+    public void setConsumer(Consumer consumer) {
+        this.consumer = consumer;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
     public void setAbonnes(List<Groupe> abonnes) {
         this.abonnes = abonnes;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public void sendMessage(String msg) {
         try {
             channel.basicPublish(Manager.EXCHANGE_NAME, "", null, msg.getBytes("UTF-8"));
-            channel.close();
-            connection.close();
-        } catch (IOException | TimeoutException e) {
+//            channel.close();
+//            connection.close();
+
+        } catch (IOException e) {
         }
     }
-    
-    public void creerGroupe(String grp) {
-        String message = Manager.MSG_NEW_GROUPE + "," + this.id + "," + grp;
+
+    public void connect(String groupeName, String pwd) {
+
+    }
+
+    public void creerGroupe(String grp, String pwd) {
+        String message = Manager.MSG_NEW_GROUPE + "," + this.id + "," + grp + "," + pwd;
         sendMessage(message);
     }
-    
-    private void init() {
+
+    public void connectToGroupeTopic() {
+        try {
+            channel.exchangeDeclare(this.currentGroupe.getName(), "topic");
+//            consumer = new DefaultConsumer(channel) {
+//                @Override
+//                public void handleDelivery(String consumerTag, Envelope envelope,
+//                        AMQP.BasicProperties properties, byte[] body) throws IOException {
+//                    String message = new String(body, "UTF-8");
+//                    System.out.println(" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+//                }
+//            };
+//            channel.basicConsume(this.currentGroupe.getName(), true, consumer);
+        } catch (IOException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void sendMsgToTopic(String msg) {
+        try {
+
+//            String routingKey = getRouting(this.currentGroupe.getName());
+//            String message = getMessage(this.currentGroupe.getName();
+            System.out.println("send message");
+            channel.basicPublish(this.currentGroupe.getName(), this.currentGroupe.getName(), null, msg.getBytes());
+            System.out.println("sent " + msg);
+        } catch (IOException ex) {
+            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void init() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
             connection = factory.newConnection();
             channel = connection.createChannel();
             channel.exchangeDeclare(Manager.EXCHANGE_NAME, "fanout");
-            String message = Manager.MSG_NEW_USER + "," + this.id + "," + this.name;
-            sendMessage(message);
+            String message = "msg," + this.name + " est connecté au groupe";
+            sendMsgToTopic(message);
         } catch (IOException | TimeoutException e) {
-            e.printStackTrace();
         }
     }
-    
+
 }

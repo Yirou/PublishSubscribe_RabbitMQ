@@ -5,18 +5,90 @@
  */
 package com.belogical.publishsubscribe_rabbitmq.meeting.views;
 
+import com.belogical.publishsubscribe_rabbitmq.meeting.Manager;
+import com.belogical.publishsubscribe_rabbitmq.meeting.model.Groupe;
+import com.belogical.publishsubscribe_rabbitmq.meeting.model.User;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author yirou
  */
-public class ManagerView extends javax.swing.JFrame {
+public class ManagerView extends javax.swing.JFrame implements Observer {
+
+    Connection connection;
+    Channel channel;
 
     /**
      * Creates new form ManagerView
      */
     public ManagerView() {
         initComponents();
-      
+        this.setVisible(true);
+        this.setResizable(false);
+        init();
+        displayUsers();
+        displayGroupes();
+
+    }
+
+    private void displayGroupes() {
+        String[] groupes = objectListToStringArray(Manager.getInstance().getGroupes());
+        listGroupeView.setListData(groupes);
+
+    }
+
+    private String[] objectListToStringArray(List<?> liste) {
+        String[] result = new String[liste.size()];
+        Groupe groupe;
+        User user;
+        usersCombo.removeAllItems();
+        for (int i = 0; i < liste.size(); i++) {
+            Object object = liste.get(i);
+            if (object instanceof Groupe) {
+                groupe = (Groupe) liste.get(i);
+                result[i] = groupe.getName();
+            }
+            if (object instanceof User) {
+                user = (User) liste.get(i);
+                result[i] = user.getName();
+                usersCombo.addItem(result[i]);
+            }
+        }
+        return result;
+    }
+
+    private void displayUsers() {
+        String[] users = objectListToStringArray(Manager.getInstance().getUsers());
+//        System.out.println("size user " + Manager.getInstance().getUsers().size());
+        listUserView.setListData(users);
+    }
+
+    private void init() {
+        try {
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost("localhost");
+            connection = factory.newConnection();
+            channel = connection.createChannel();
+            channel.exchangeDeclare(Manager.EXCHANGE_NAME, "fanout");
+//            channel.close();
+//            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TimeoutException ex) {
+            Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -36,7 +108,11 @@ public class ManagerView extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         listUserView = new javax.swing.JList<>();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        groupeTxt = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        usersCombo = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -45,9 +121,15 @@ public class ManagerView extends javax.swing.JFrame {
 
         jLabel1.setText("new user");
 
+        nameTxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nameTxtActionPerformed(evt);
+            }
+        });
+
         listGroupeView.setBorder(javax.swing.BorderFactory.createTitledBorder("Choose group"));
         listGroupeView.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = { "groupe1" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -55,15 +137,29 @@ public class ManagerView extends javax.swing.JFrame {
 
         listUserView.setBorder(javax.swing.BorderFactory.createTitledBorder("Choose user"));
         listUserView.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = { "user1" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane2.setViewportView(listUserView);
 
         jButton1.setText("Next >>");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Add");
+        jLabel2.setText("new groupe");
+
+        jButton3.setText("Add");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("admin");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -71,41 +167,57 @@ public class ManagerView extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(18, 18, 18)
-                                .addComponent(nameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 614, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(nameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 614, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(groupeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(usersCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(105, 105, 105)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(26, Short.MAX_VALUE))))
+                        .addGap(14, 14, 14)))
+                .addGap(24, 24, 24))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(nameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(groupeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3)
+                    .addComponent(jLabel3)
+                    .addComponent(usersCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(nameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jButton2))
-                .addGap(35, 35, 35)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addContainerGap(18, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jScrollPane1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1))
         );
 
         jMenu1.setText("File");
@@ -129,6 +241,51 @@ public class ManagerView extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof Manager) {
+            displayGroupes();
+            displayUsers();
+            System.out.println("update");
+        }
+    }
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        try {
+            String message = Manager.MSG_NEW_GROUPE + "," + groupeTxt.getText() + "," + usersCombo.getSelectedItem().toString();
+            channel.basicPublish(Manager.EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
+            groupeTxt.setText("");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (listGroupeView.getSelectedIndex() == -1 || listUserView.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(null, "Veuillez choisir un groupe et un utilisateur");
+        } else {
+            String grp = listGroupeView.getSelectedValue();
+            String user = listUserView.getSelectedValue();
+            new ConnetedView(grp, user, this);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void nameTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameTxtActionPerformed
+        if (!nameTxt.getText().equals("")) {
+            try {
+                String message = Manager.MSG_NEW_USER + "," + nameTxt.getText();
+                channel.basicPublish(Manager.EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
+                System.out.println(channel);
+                nameTxt.setText("");
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+// TODO add your handling code here:
+    }//GEN-LAST:event_nameTxtActionPerformed
 
     /**
      * @param args the command line arguments
@@ -166,9 +323,12 @@ public class ManagerView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField groupeTxt;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -178,5 +338,7 @@ public class ManagerView extends javax.swing.JFrame {
     private javax.swing.JList<String> listGroupeView;
     private javax.swing.JList<String> listUserView;
     private javax.swing.JTextField nameTxt;
+    private javax.swing.JComboBox<String> usersCombo;
     // End of variables declaration//GEN-END:variables
+
 }
