@@ -6,18 +6,13 @@
 package com.belogical.publishsubscribe_rabbitmq.meeting.model;
 
 import com.belogical.publishsubscribe_rabbitmq.meeting.Manager;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
-import com.rabbitmq.client.DefaultConsumer;
-import com.rabbitmq.client.Envelope;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,25 +21,24 @@ import java.util.logging.Logger;
  *
  * @author yirou
  */
-public class User {
+public class Agent {
 
     private int id;
     private String name;
     private List<String> messages = new ArrayList<>();
-    private List<Groupe> abonnes = new ArrayList<>();
     private Consumer consumer;
     private boolean online;
     private Connection connection;
     private Channel channel;
     private Groupe currentGroupe;
 
-    public User(int id, String name) {
+    public Agent(int id, String name) {
         this.id = id;
         this.name = name;
 
     }
 
-    public User(String name) {
+    public Agent(String name) {
         this.name = name;
     }
 
@@ -76,10 +70,6 @@ public class User {
         this.messages = messages;
     }
 
-    public List<Groupe> getAbonnes() {
-        return abonnes;
-    }
-
     public Consumer getConsumer() {
         return consumer;
     }
@@ -104,10 +94,6 @@ public class User {
         this.channel = channel;
     }
 
-    public void setAbonnes(List<Groupe> abonnes) {
-        this.abonnes = abonnes;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -122,7 +108,7 @@ public class User {
 
     public void sendMessage(String msg) {
         try {
-            channel.basicPublish(Manager.EXCHANGE_NAME, "", null, msg.getBytes("UTF-8"));
+            channel.basicPublish(Manager.QUEUE_NAME, "", null, msg.getBytes("UTF-8"));
 //            channel.close();
 //            connection.close();
 
@@ -130,8 +116,14 @@ public class User {
         }
     }
 
-    public void connect(String groupeName, String pwd) {
 
+    public void logout() {
+        try {
+            channel.close();
+            connection.close();
+        } catch (IOException | TimeoutException ex) {
+            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void creerGroupe(String grp, String pwd) {
@@ -152,20 +144,17 @@ public class User {
 //            };
 //            channel.basicConsume(this.currentGroupe.getName(), true, consumer);
         } catch (IOException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void sendMsgToTopic(String msg) {
         try {
 
-//            String routingKey = getRouting(this.currentGroupe.getName());
-//            String message = getMessage(this.currentGroupe.getName();
-            System.out.println("send message");
             channel.basicPublish(this.currentGroupe.getName(), this.currentGroupe.getName(), null, msg.getBytes());
-            System.out.println("sent " + msg);
+            System.out.println("send " + msg);
         } catch (IOException ex) {
-            Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -175,7 +164,7 @@ public class User {
             factory.setHost("localhost");
             connection = factory.newConnection();
             channel = connection.createChannel();
-            channel.exchangeDeclare(Manager.EXCHANGE_NAME, "fanout");
+            channel.exchangeDeclare(Manager.QUEUE_NAME, "fanout");
             String message = "msg," + this.name + " est connecté au groupe";
             sendMsgToTopic(message);
         } catch (IOException | TimeoutException e) {

@@ -7,7 +7,7 @@ package com.belogical.publishsubscribe_rabbitmq.meeting.utils;
 
 import com.belogical.publishsubscribe_rabbitmq.meeting.Manager;
 import com.belogical.publishsubscribe_rabbitmq.meeting.model.Groupe;
-import com.belogical.publishsubscribe_rabbitmq.meeting.model.User;
+import com.belogical.publishsubscribe_rabbitmq.meeting.model.Agent;
 
 /**
  *
@@ -15,8 +15,8 @@ import com.belogical.publishsubscribe_rabbitmq.meeting.model.User;
  */
 public class SearchUtils {
     
-    public static User findUser(int id) {
-        for (User u : Manager.getInstance().getUsers()) {
+    public static Agent findUser(int id) {
+        for (Agent u : Manager.getInstance().getUsers()) {
             if (u.getId() == id) {
                 return u;
             }
@@ -24,8 +24,8 @@ public class SearchUtils {
         return null;
     }
 
-    public static User findUser(String name) {
-        for (User u : Manager.getInstance().getUsers()) {
+    public static Agent findUser(String name) {
+        for (Agent u : Manager.getInstance().getUsers()) {
             if (u.getName().equalsIgnoreCase(name)) {
                 return u;
             }

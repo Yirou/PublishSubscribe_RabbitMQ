@@ -28,25 +28,37 @@ import java.util.concurrent.TimeoutException;
  */
 public class Groupe extends Observable {
 
-    private List<User> users = new ArrayList<>();
-    private User admin;
+    private Agent admin;
     private String name;
     private String password;
     private Date begin;
-    private Date deadLine;
+    private int deadLine;
+    private List<Agent> users = new ArrayList<>();
     private List<String> messages = new ArrayList<>();
     private List<String> proposedDate = new ArrayList<>();
     private Map<String, List<String>> selectedDate = new HashMap<>();
+    private TimerGroupeDeadLine timer;
+
     private Connection connection;
     private Channel channel;
 
-    public Groupe(String name, String password, User admin) {
+    public Groupe(String name, String password, int deadLine, Agent admin, TimerGroupeDeadLine timer) {
         this.name = name;
         this.password = password;
         this.admin = admin;
+        this.timer = timer;
+        this.deadLine = deadLine;
     }
 
-    public User getAdmin() {
+    public void setTimer(TimerGroupeDeadLine timer) {
+        this.timer = timer;
+    }
+
+    public TimerGroupeDeadLine getTimer() {
+        return timer;
+    }
+
+    public Agent getAdmin() {
         return admin;
     }
 
@@ -66,11 +78,11 @@ public class Groupe extends Observable {
         this.selectedDate = selectedDate;
     }
 
-    public void setAdmin(User admin) {
+    public void setAdmin(Agent admin) {
         this.admin = admin;
     }
 
-    public Groupe(String name, String password, Date begin, Date deadLine) {
+    public Groupe(String name, String password, Date begin, int deadLine) {
         this.name = name;
         this.password = password;
         this.begin = begin;
@@ -105,11 +117,11 @@ public class Groupe extends Observable {
         this.begin = begin;
     }
 
-    public Date getDeadLine() {
+    public int getDeadLine() {
         return deadLine;
     }
 
-    public void setDeadLine(Date deadLine) {
+    public void setDeadLine(int deadLine) {
         this.deadLine = deadLine;
     }
 
@@ -117,17 +129,17 @@ public class Groupe extends Observable {
         this.name = name;
     }
 
-    public List<User> getUsers() {
+    public List<Agent> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(List<Agent> users) {
         this.users = users;
     }
 
     public void sendMessage(String msg) {
         try {
-            channel.basicPublish(Manager.EXCHANGE_NAME, "", null, msg.getBytes("UTF-8"));
+            channel.basicPublish(Manager.QUEUE_NAME, "", null, msg.getBytes("UTF-8"));
             channel.close();
             connection.close();
         } catch (IOException | TimeoutException e) {
@@ -153,12 +165,11 @@ public class Groupe extends Observable {
                     String message = new String(body, "UTF-8");
                     if (message.startsWith("msg,")) {
                         messages.add(message);
-                        
+
                     } else if (message.startsWith("dateAdmin")) {
                         message = message.replace("dateAdmin,", "");
                         proposedDate.add(message.split(",")[1]);
                     } else if (message.startsWith("dateUser")) {
-                        System.out.println("YEs yes yes ");
                         message = message.replace("dateUser,", "");
                         msg = message.split(",");
                         List<String> mesMessages = selectedDate.get(msg[0].trim());
