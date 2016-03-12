@@ -10,8 +10,8 @@ import com.belogical.publishsubscribe_rabbitmq.meeting.model.Agent;
 import com.belogical.publishsubscribe_rabbitmq.meeting.utils.SearchUtils;
 import com.toedter.calendar.JDateChooser;
 import java.awt.FlowLayout;
+import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,18 +27,22 @@ import javax.swing.table.DefaultTableModel;
  * @author yirou
  */
 public class ConnetedView extends javax.swing.JFrame implements Observer {
-    
+
     Agent user;
     Groupe groupe;
     ManagerView managerView;
-    JDateChooser dateChooser;
-    JDateChooser datePropose;
+    JDateChooser dateProposeParAdminChooser;
+    JDateChooser dateProposeParLesAgentsChooser;
+    int counterDateMessage = 0;
 
     /**
      * Creates new form ConnetedView
+     * @param grp
+     * @param user
      */
     public ConnetedView(String grp, String user, ManagerView managerView) {
         initComponents();
+        setResizable(false);
         this.managerView = managerView;
         this.user = SearchUtils.findUser(user);
         userNameTxt.setText(this.user.getName());
@@ -47,43 +51,35 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         setLocationRelativeTo(null);
         jPanel2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         proposePanelDate.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        dateChooser = new JDateChooser();
-        datePropose = new JDateChooser();
-        jPanel2.add(dateChooser);
-        proposePanelDate.add(datePropose);
-        
+        dateProposeParAdminChooser = new JDateChooser();
+        dateProposeParLesAgentsChooser = new JDateChooser();
+        jPanel2.add(dateProposeParAdminChooser);
+        proposePanelDate.add(dateProposeParLesAgentsChooser);
         checkAccess();
     }
-    
+
     private void initPaneldate() {
-        
+
     }
-    
+
     public void setManagerView(ManagerView managerView) {
         this.managerView = managerView;
     }
-    
+
     public ManagerView getManagerView() {
         return managerView;
     }
-    
+
     private void checkAccess() {
         if (user.isOnline()) {
             JOptionPane.showMessageDialog(null, "Utilisateur dejà connecté");
-        } else if (groupe.getAdmin().equals(this.user)) {
-            String pwd = JOptionPane.showInputDialog("veuillez saisir le mot de passe");
-            if (pwd.equalsIgnoreCase(groupe.getPassword())) {
-                acceptConnexion();
-            } else {
-                JOptionPane.showMessageDialog(null, "Mot de passe incorrecte");
-                this.dispose();
-            }
         } else {
-            dateChooser.setEnabled(false);
             acceptConnexion();
+            disableDateButon();
         }
+
     }
-    
+
     private void acceptConnexion() {
         this.setVisible(true);
         user.setOnline(true);
@@ -93,7 +89,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         user.connectToGroupeTopic();
         this.groupe.getUsers().add(user);
         this.groupe.getTimer().addObserver(this);
-        
+
     }
 
     /**
@@ -108,6 +104,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         panelDate = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jButton3 = new javax.swing.JButton();
         msgTxt = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -122,7 +119,9 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         userNameTxt = new javax.swing.JLabel();
         proposePanelDate = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -144,16 +143,29 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         ));
         jScrollPane2.setViewportView(jTable1);
 
+        jButton3.setText("Calculer le resultat");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelDateLayout = new javax.swing.GroupLayout(panelDate);
         panelDate.setLayout(panelDateLayout);
         panelDateLayout.setHorizontalGroup(
             panelDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelDateLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         panelDateLayout.setVerticalGroup(
             panelDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelDateLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
+                .addComponent(jButton3)
                 .addContainerGap())
         );
 
@@ -163,7 +175,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
             }
         });
 
-        jButton1.setText("Add date");
+        jButton1.setText("Ajouter date");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -177,7 +189,8 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         });
         jScrollPane1.setViewportView(listMsg);
 
-        jLabel2.setFont(new java.awt.Font("URW Chancery L", 0, 15)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("URW Chancery L", 3, 15)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(2, 89, 168));
         jLabel2.setText("your message");
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -190,7 +203,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 62, Short.MAX_VALUE)
+            .addGap(0, 78, Short.MAX_VALUE)
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -237,26 +250,25 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         proposePanelDate.setLayout(proposePanelDateLayout);
         proposePanelDateLayout.setHorizontalGroup(
             proposePanelDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 179, Short.MAX_VALUE)
+            .addGap(0, 169, Short.MAX_VALUE)
         );
         proposePanelDateLayout.setVerticalGroup(
             proposePanelDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        jButton2.setText("Propose");
+        jButton2.setText("Ajouter date");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Calcul resultat");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+        jLabel4.setText("Admin, dates possibles");
+
+        jLabel5.setText("Agent, date disponible");
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -273,33 +285,40 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(104, 104, 104))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(9, 9, 9)
+                                .addComponent(proposePanelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(28, 28, 28)
+                                .addComponent(jLabel5)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(292, 292, 292)
+                        .addComponent(jLabel2))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(panelDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(userNameTxt))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(msgTxt)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton1))
-                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(proposePanelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(24, 24, 24)
-                                .addComponent(jButton2))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(144, 144, 144)
-                                .addComponent(jLabel2)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 287, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                            .addComponent(msgTxt))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -314,25 +333,33 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
                         .addGap(18, 18, 18)
                         .addComponent(panelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(msgTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButton2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel2))))
-                    .addGroup(layout.createSequentialGroup()
+                        .addGap(50, 50, 50)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(msgTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(proposePanelDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(30, Short.MAX_VALUE))
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel4))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel5)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(proposePanelDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(19, 19, 19)
+                                .addComponent(jButton1)))))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         pack();
@@ -345,9 +372,9 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_msgTxtActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (dateChooser.getDate() != null) {
+        if (dateProposeParAdminChooser.getDate() != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-            Date d = dateChooser.getDate();
+            Date d = dateProposeParAdminChooser.getDate();
             String msg = "dateAdmin," + user.getName() + " , " + formatter.format(d);
             user.sendMsgToTopic(msg);
         }
@@ -355,11 +382,14 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if (datePropose.getDate() != null) {
+        if (dateProposeParLesAgentsChooser.getDate() != null && counterDateMessage < 3) {
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-            Date d = datePropose.getDate();
+            Date d = dateProposeParLesAgentsChooser.getDate();
             String msg = "dateUser," + user.getName() + " , " + formatter.format(d);
             user.sendMsgToTopic(msg);
+            counterDateMessage++;
+        } else {
+            JOptionPane.showMessageDialog(null, "Vous avez atteint le nombre maximum de proposition");
         }
 
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -367,8 +397,8 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         Map<String, Integer> result = new HashMap<>();
         List<String> userProposition;
-        for (String key : groupe.getSelectedDate().keySet()) {
-            userProposition = groupe.getSelectedDate().get(key);
+        for (String key : groupe.getDateProposeParLesAgents().keySet()) {
+            userProposition = groupe.getDateProposeParLesAgents().get(key);
             for (String date : userProposition) {
                 if (result.get(date) == null) {
                     result.put(date, 1);
@@ -379,11 +409,11 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
                 }
             }
         }
-        
+
         String dateRetenue = findMax(result);
         String msg = "msg," + user.getName() + " >> Date retenue : " + dateRetenue;
         user.sendMsgToTopic(msg);
-        
+
 
     }//GEN-LAST:event_jButton3ActionPerformed
     private String findMax(Map<String, Integer> result) {
@@ -397,7 +427,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         }
         return date;
     }
-    
+
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof Groupe) {
@@ -407,32 +437,43 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         } else if (this.groupe.getTimer().isAlive()) {
             timerTxt.setText(this.groupe.getDeadLine() + " s");
         } else {
-            JOptionPane.showMessageDialog(null, "Fin de proposition de dates");
-            datePropose.setEnabled(false);
-            jButton2.setEnabled(false);
+//            JOptionPane.showMessageDialog(null, "Fin de proposition de dates");
+            disableDateButon();
         }
     }
-    
+
+    private void disableDateButon() {
+        if (!this.groupe.getTimer().isAlive()) {
+            dateProposeParLesAgentsChooser.setEnabled(false);
+            jButton2.setEnabled(false);
+        }
+        if (!this.groupe.getAdmin().equals(user)) {
+            dateProposeParAdminChooser.setEnabled(false);
+            jButton1.setEnabled(false);
+        }
+
+    }
+
     private void displayDates() {
         StringBuilder msg = new StringBuilder();
         List<String> dateUser;
         String[] column = {"User", "Date1", "Date2", "Date3"};
-        jTable1.setModel(new DefaultTableModel(column, groupe.getSelectedDate().size()));
-        for (String m : this.groupe.getProposedDate()) {
+        jTable1.setModel(new DefaultTableModel(column, groupe.getDateProposeParLesAgents().size()));
+        for (String m : this.groupe.getDateProposeParAdmin()) {
             msg.append(m + " | ");
         }
         proposedDateTxt.setText(msg.toString());
-        
+
         for (Agent u : groupe.getUsers()) {
-            dateUser = this.groupe.getSelectedDate().get(u.getName());
+            dateUser = this.groupe.getDateProposeParLesAgents().get(u.getName());
             if (dateUser != null) {
                 displayInTable(u, dateUser);
             }
-            
+
         }
-        
+
     }
-    
+
     private void displayInTable(Agent u, List<String> dateUser) {
         int line = u.getId() - 1;
         jTable1.setValueAt(u.getName(), line, 0);
@@ -440,59 +481,25 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
             jTable1.setValueAt(dateUser.get(i), line, i + 1);
         }
     }
-    
+
     private String[] objectListToStringArray(List<?> liste, String toDelete) {
         String[] result = new String[liste.size()];
         for (int i = 0; i < liste.size(); i++) {
             String msg = liste.get(i).toString();
             if (msg.startsWith(toDelete)) {
-                
+
                 result[i] = msg.replace(toDelete, "");
             }
-            
+
         }
         return result;
     }
-    
+
     private void displayMsgs() {
         String[] msg = objectListToStringArray(groupe.getMessages(), "msg,");
         listMsg.setListData(msg);
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ConnetedView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ConnetedView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ConnetedView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ConnetedView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ConnetedView(null, null, null).setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -501,6 +508,8 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -508,6 +517,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable1;
     private javax.swing.JList<String> listMsg;
     private javax.swing.JTextField msgTxt;
@@ -517,5 +527,15 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
     private javax.swing.JLabel timerTxt;
     private javax.swing.JLabel userNameTxt;
     // End of variables declaration//GEN-END:variables
+@Override
+    protected void processWindowEvent(WindowEvent we) {
+        if (WindowEvent.WINDOW_CLOSING == we.getID()) {
+            groupe.deleteObserver(this);
+            this.dispose();
+            user.logout();
+
+        }
+
+    }
 
 }

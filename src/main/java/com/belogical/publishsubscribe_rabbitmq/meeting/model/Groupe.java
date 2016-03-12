@@ -35,14 +35,15 @@ public class Groupe extends Observable {
     private int deadLine;
     private List<Agent> users = new ArrayList<>();
     private List<String> messages = new ArrayList<>();
-    private List<String> proposedDate = new ArrayList<>();
-    private Map<String, List<String>> selectedDate = new HashMap<>();
-    private TimerGroupeDeadLine timer;
+    private List<String> dateProposeParAdmin = new ArrayList<>();
+    private Map<String, List<String>> dateProposeParLesAgents = new HashMap<>();
+    private int maxChoixPossiblePourUneReunion = 5;
+    private TimerDeadLine timer;
 
     private Connection connection;
     private Channel channel;
 
-    public Groupe(String name, String password, int deadLine, Agent admin, TimerGroupeDeadLine timer) {
+    public Groupe(String name, String password, int deadLine, Agent admin, TimerDeadLine timer) {
         this.name = name;
         this.password = password;
         this.admin = admin;
@@ -50,11 +51,11 @@ public class Groupe extends Observable {
         this.deadLine = deadLine;
     }
 
-    public void setTimer(TimerGroupeDeadLine timer) {
+    public void setTimer(TimerDeadLine timer) {
         this.timer = timer;
     }
 
-    public TimerGroupeDeadLine getTimer() {
+    public TimerDeadLine getTimer() {
         return timer;
     }
 
@@ -62,20 +63,28 @@ public class Groupe extends Observable {
         return admin;
     }
 
-    public List<String> getProposedDate() {
-        return proposedDate;
+    public List<String> getDateProposeParAdmin() {
+        return dateProposeParAdmin;
     }
 
-    public void setProposedDate(List<String> proposedDate) {
-        this.proposedDate = proposedDate;
+    public void setDateProposeParAdmin(List<String> dateProposeParAdmin) {
+        this.dateProposeParAdmin = dateProposeParAdmin;
     }
 
-    public Map<String, List<String>> getSelectedDate() {
-        return selectedDate;
+    public Map<String, List<String>> getDateProposeParLesAgents() {
+        return dateProposeParLesAgents;
     }
 
-    public void setSelectedDate(Map<String, List<String>> selectedDate) {
-        this.selectedDate = selectedDate;
+    public void setDateProposeParLesAgents(Map<String, List<String>> dateProposeParLesAgents) {
+        this.dateProposeParLesAgents = dateProposeParLesAgents;
+    }
+
+    public int getMaxChoixPossiblePourUneReunion() {
+        return maxChoixPossiblePourUneReunion;
+    }
+
+    public void setMaxChoixPossiblePourUneReunion(int maxChoixPossiblePourUneDate) {
+        this.maxChoixPossiblePourUneReunion = maxChoixPossiblePourUneDate;
     }
 
     public void setAdmin(Agent admin) {
@@ -167,22 +176,25 @@ public class Groupe extends Observable {
                         messages.add(message);
 
                     } else if (message.startsWith("dateAdmin")) {
-                        message = message.replace("dateAdmin,", "");
-                        proposedDate.add(message.split(",")[1]);
+
+                        if (dateProposeParAdmin.size() < maxChoixPossiblePourUneReunion) {
+                            message = message.replace("dateAdmin,", "");
+                            dateProposeParAdmin.add(message.split(",")[1]);
+                        }
+
                     } else if (message.startsWith("dateUser")) {
                         message = message.replace("dateUser,", "");
                         msg = message.split(",");
-                        List<String> mesMessages = selectedDate.get(msg[0].trim());
+                        List<String> mesMessages = dateProposeParLesAgents.get(msg[0].trim());
                         if (mesMessages == null) {
                             mesMessages = new ArrayList<>();
                         }
                         mesMessages.add(msg[1]);
-                        selectedDate.put(msg[0].trim(), mesMessages);
+                        dateProposeParLesAgents.put(msg[0].trim(), mesMessages);
                     }
 
                     setChanged();
                     notifyObservers();
-//                    System.out.println(message);
                     System.out.println(" [x] Received " + message);
                 }
             };

@@ -7,7 +7,7 @@ package com.belogical.publishsubscribe_rabbitmq.meeting;
 
 import com.belogical.publishsubscribe_rabbitmq.meeting.model.Groupe;
 import com.belogical.publishsubscribe_rabbitmq.meeting.model.Agent;
-import com.belogical.publishsubscribe_rabbitmq.meeting.model.TimerGroupeDeadLine;
+import com.belogical.publishsubscribe_rabbitmq.meeting.model.TimerDeadLine;
 import com.belogical.publishsubscribe_rabbitmq.meeting.utils.SearchUtils;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -61,13 +61,6 @@ public class Manager extends Observable {
 
     public void init() {
         try {
-//            ConnectionFactory factory = new ConnectionFactory();
-//            factory.setHost("localhost");
-//            Connection connection = factory.newConnection();
-//            Channel channel = connection.createChannel();
-//            channel.exchangeDeclare(QUEUE_NAME, "fanout");
-//            String queueName = channel.queueDeclare().getQueue();
-//            channel.queueBind(queueName, QUEUE_NAME, "");
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
             Connection connection = factory.newConnection();
@@ -98,7 +91,7 @@ public class Manager extends Observable {
             System.out.println(message);
             int deaLine = Integer.parseInt(messages[3]);
             Agent admin = SearchUtils.findUser(messages[2]);
-            TimerGroupeDeadLine timer = new TimerGroupeDeadLine(null);
+            TimerDeadLine timer = new TimerDeadLine(null);
             Groupe groupe = new Groupe(messages[1], "", deaLine * 60, admin, timer);
             groupe.init();
             timer.setGroupe(groupe);

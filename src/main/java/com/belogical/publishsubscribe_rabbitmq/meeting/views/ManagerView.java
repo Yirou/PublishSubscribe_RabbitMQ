@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
  * @author yirou
  */
 public class ManagerView extends javax.swing.JFrame implements Observer {
-
+    
     Connection connection;
     Channel channel;
     private static ManagerView INSTANCE = new ManagerView();
@@ -38,22 +38,21 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
         initComponents();
         this.setVisible(true);
         this.setResizable(false);
-//        init();
         displayUsers();
         displayGroupes();
-
+        
     }
-
+    
     public static ManagerView getInstance() {
         return INSTANCE;
     }
-
+    
     private void displayGroupes() {
         String[] groupes = objectListToStringArray(Manager.getInstance().getGroupes());
         listGroupeView.setListData(groupes);
-
+        
     }
-
+    
     private String[] objectListToStringArray(List<?> liste) {
         String[] result = new String[liste.size()];
         Groupe groupe;
@@ -73,13 +72,13 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
         }
         return result;
     }
-
+    
     private void displayUsers() {
         String[] users = objectListToStringArray(Manager.getInstance().getUsers());
 //        System.out.println("size user " + Manager.getInstance().getUsers().size());
         listUserView.setListData(users);
     }
-
+    
     public void init() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
@@ -87,8 +86,6 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
             connection = factory.newConnection();
             channel = connection.createChannel();
             channel.queueDeclare(Manager.QUEUE_NAME, false, false, false, null);
-//            channel.close();
-//            connection.close();
         } catch (IOException ex) {
             Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
         } catch (TimeoutException ex) {
@@ -135,7 +132,7 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
             }
         });
 
-        listGroupeView.setBorder(javax.swing.BorderFactory.createTitledBorder("Choose group"));
+        listGroupeView.setBorder(javax.swing.BorderFactory.createTitledBorder("Choisir groupe"));
         listGroupeView.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "groupe1" };
             public int getSize() { return strings.length; }
@@ -143,7 +140,7 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
         });
         jScrollPane1.setViewportView(listGroupeView);
 
-        listUserView.setBorder(javax.swing.BorderFactory.createTitledBorder("Choose user"));
+        listUserView.setBorder(javax.swing.BorderFactory.createTitledBorder("Choisir agent"));
         listUserView.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "user1" };
             public int getSize() { return strings.length; }
@@ -160,7 +157,7 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Nouveau groupe"));
 
-        jLabel2.setText("noim groupe :");
+        jLabel2.setText("nom groupe :");
 
         jLabel3.setText("admin :");
 
@@ -202,7 +199,7 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
                     .addComponent(groupeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(usersCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(dureTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -239,10 +236,10 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
                     .addComponent(nameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1))
         );
@@ -284,6 +281,7 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
                 String message = Manager.MSG_NEW_GROUPE + "," + groupeTxt.getText() + "," + usersCombo.getSelectedItem().toString() + "," + dureTxt.getText();
                 channel.basicPublish("", Manager.QUEUE_NAME, null, message.getBytes("UTF-8"));
                 groupeTxt.setText("");
+                dureTxt.setText("");
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -316,44 +314,10 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
                 Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Ce champs  ne peut être nul");
+            JOptionPane.showMessageDialog(null, "Ce champs  ne peut être vide");
         }
     }//GEN-LAST:event_nameTxtActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ManagerView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ManagerView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ManagerView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ManagerView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ManagerView().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField dureTxt;

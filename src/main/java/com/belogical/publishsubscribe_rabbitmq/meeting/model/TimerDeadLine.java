@@ -13,13 +13,13 @@ import java.util.logging.Logger;
  *
  * @author yirou
  */
-public class TimerGroupeDeadLine extends Observable implements Runnable {
+public class TimerDeadLine extends Observable implements Runnable {
 
     private Thread thread;
     private Groupe groupe;
     private boolean alive = true;
 
-    public TimerGroupeDeadLine(Groupe groupe) {
+    public TimerDeadLine(Groupe groupe) {
         thread = new Thread(this);
         this.groupe = groupe;
     }
@@ -58,7 +58,7 @@ public class TimerGroupeDeadLine extends Observable implements Runnable {
             }
 
         } catch (InterruptedException ex) {
-            Logger.getLogger(TimerGroupeDeadLine.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TimerDeadLine.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
