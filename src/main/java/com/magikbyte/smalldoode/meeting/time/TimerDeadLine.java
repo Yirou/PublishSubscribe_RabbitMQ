@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.magikbyte.smalldoode.meeting.model;
+package com.magikbyte.smalldoode.meeting.time;
 
+import com.magikbyte.smalldoode.meeting.model.Groupe;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;

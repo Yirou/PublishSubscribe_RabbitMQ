@@ -5,6 +5,7 @@
  */
 package com.magikbyte.smalldoode.meeting.model;
 
+import com.magikbyte.smalldoode.meeting.time.TimerDeadLine;
 import com.magikbyte.smalldoode.meeting.Manager;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;

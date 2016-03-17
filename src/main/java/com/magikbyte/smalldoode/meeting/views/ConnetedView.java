@@ -456,7 +456,6 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         StringBuilder msg = new StringBuilder();
         List<String> dateUser;
         String[] column = {"User", "Date1", "Date2", "Date3"};
-        System.out.println("Size " + groupe.getUsers().size());
         jTable1.setModel(new DefaultTableModel(column, groupe.getUsers().size()));
         for (String m : this.groupe.getDateProposeParAdmin()) {
             msg.append(m + " | ");
@@ -475,7 +474,6 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
 
     private void displayInTable(Agent u, List<String> dateUser) {
         int line = u.getId() - 1;
-        System.out.println("Line " + line);
         jTable1.setValueAt(u.getName(), line, 0);
         for (int i = 0; i < dateUser.size(); i++) {
             jTable1.setValueAt(dateUser.get(i), line, i + 1);
