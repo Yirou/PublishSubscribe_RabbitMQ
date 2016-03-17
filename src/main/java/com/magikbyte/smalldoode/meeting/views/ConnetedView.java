@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.magikbyte.samlldoode.meeting.views;
+package com.magikbyte.smalldoode.meeting.views;
 
-import com.magikbyte.samlldoode.meeting.model.Groupe;
-import com.magikbyte.samlldoode.meeting.model.Agent;
-import com.magikbyte.samlldoode.meeting.utils.SearchUtils;
+import com.magikbyte.smalldoode.meeting.model.Groupe;
+import com.magikbyte.smalldoode.meeting.model.Agent;
+import com.magikbyte.smalldoode.meeting.utils.SearchUtils;
 import com.toedter.calendar.JDateChooser;
 import java.awt.FlowLayout;
 import java.awt.event.WindowEvent;

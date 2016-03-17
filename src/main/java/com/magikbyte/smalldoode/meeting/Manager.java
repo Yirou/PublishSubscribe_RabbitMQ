@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.magikbyte.samlldoode.meeting;
+package com.magikbyte.smalldoode.meeting;
 
-import com.magikbyte.samlldoode.meeting.model.Groupe;
-import com.magikbyte.samlldoode.meeting.model.Agent;
-import com.magikbyte.samlldoode.meeting.model.TimerDeadLine;
-import com.magikbyte.samlldoode.meeting.utils.SearchUtils;
+import com.magikbyte.smalldoode.meeting.model.Groupe;
+import com.magikbyte.smalldoode.meeting.model.Agent;
+import com.magikbyte.smalldoode.meeting.model.TimerDeadLine;
+import com.magikbyte.smalldoode.meeting.utils.SearchUtils;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;

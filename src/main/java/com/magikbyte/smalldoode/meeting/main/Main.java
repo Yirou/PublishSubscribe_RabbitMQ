@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.magikbyte.samlldoode.meeting.main;
+package com.magikbyte.smalldoode.meeting.main;
 
-import com.magikbyte.samlldoode.meeting.Manager;
-import com.magikbyte.samlldoode.meeting.views.ManagerView;
+import com.magikbyte.smalldoode.meeting.Manager;
+import com.magikbyte.smalldoode.meeting.views.ManagerView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UnsupportedLookAndFeelException;

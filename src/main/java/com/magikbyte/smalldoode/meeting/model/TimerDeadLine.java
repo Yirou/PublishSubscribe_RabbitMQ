@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.magikbyte.samlldoode.meeting.model;
+package com.magikbyte.smalldoode.meeting.model;
 
 import java.util.Observable;
 import java.util.logging.Level;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class TimerDeadLine extends Observable implements Runnable {
 
-    private Thread thread;
+    private final Thread thread;
     private Groupe groupe;
     private boolean alive = true;
 
@@ -39,7 +39,6 @@ public class TimerDeadLine extends Observable implements Runnable {
     public boolean isAlive() {
         return alive;
     }
-    
 
     @Override
     public void run() {

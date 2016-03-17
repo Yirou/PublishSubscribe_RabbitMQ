@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.magikbyte.samlldoode.meeting.model;
+package com.magikbyte.smalldoode.meeting.model;
 
-import com.magikbyte.samlldoode.meeting.Manager;
+import com.magikbyte.smalldoode.meeting.Manager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
