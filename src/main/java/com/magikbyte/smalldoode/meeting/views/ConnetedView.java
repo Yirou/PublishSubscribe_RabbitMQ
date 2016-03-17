@@ -37,6 +37,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
 
     /**
      * Creates new form ConnetedView
+     *
      * @param grp
      * @param user
      */
@@ -72,23 +73,16 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
 
     private void checkAccess() {
         if (user.isOnline()) {
-            JOptionPane.showMessageDialog(null, "Utilisateur dejà connecté");
+            JOptionPane.showMessageDialog(null, "Utilisateur dejà en ligne");
+            this.dispose();
         } else {
-            acceptConnexion();
+            groupe.acceptConnexion(user);
+            groupe.addObserver(this);
+            groupe.getTimer().addObserver(this);
+            this.setVisible(true);
+
             disableDateButon();
         }
-
-    }
-
-    private void acceptConnexion() {
-        this.setVisible(true);
-        user.setOnline(true);
-        this.user.setCurrentGroupe(groupe);
-        groupe.addObserver(this);
-        this.user.init();
-        user.connectToGroupeTopic();
-        this.groupe.getUsers().add(user);
-        this.groupe.getTimer().addObserver(this);
 
     }
 
@@ -143,7 +137,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         ));
         jScrollPane2.setViewportView(jTable1);
 
-        jButton3.setText("Calculer le resultat");
+        jButton3.setText("Simuler le resultat");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -287,38 +281,34 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(104, 104, 104))
+                            .addComponent(jLabel4)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton1)))
+                        .addGap(12, 12, 12)
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(9, 9, 9)
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 150, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(msgTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(proposePanelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton2)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(28, 28, 28)
-                                .addComponent(jLabel5)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(292, 292, 292)
-                        .addComponent(jLabel2))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(panelDate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(userNameTxt))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
-                            .addComponent(msgTxt))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -335,11 +325,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
                     .addComponent(jScrollPane1))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(50, 50, 50)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(msgTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(84, 84, 84)
                         .addComponent(jLabel2))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -357,8 +343,13 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
                                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addComponent(jButton1)))))
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton1))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(msgTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2)))
                 .addContainerGap(28, Short.MAX_VALUE))
         );
 
@@ -400,13 +391,10 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         for (String key : groupe.getDateProposeParLesAgents().keySet()) {
             userProposition = groupe.getDateProposeParLesAgents().get(key);
             for (String date : userProposition) {
-                if (result.get(date) == null) {
-                    result.put(date, 1);
-                } else {
-                    int occurence = result.get(date);
-                    occurence++;
-                    result.put(date, occurence);
+                if (groupe.getDateProposeParAdmin().contains(date)) {
+                    analyserDate(result, date);
                 }
+
             }
         }
 
@@ -416,6 +404,17 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
 
 
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void analyserDate(Map<String, Integer> result, String date) {
+        if (result.get(date) == null) {
+            result.put(date, 1);
+        } else {
+            int occurence = result.get(date);
+            occurence++;
+            result.put(date, occurence);
+        }
+    }
+
     private String findMax(Map<String, Integer> result) {
         int max = 0;
         String date = "";

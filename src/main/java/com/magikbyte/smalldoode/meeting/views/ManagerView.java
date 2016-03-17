@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
  * @author yirou
  */
 public class ManagerView extends javax.swing.JFrame implements Observer {
-    
+
     Connection connection;
     Channel channel;
     private static ManagerView INSTANCE = new ManagerView();
@@ -40,19 +40,19 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
         this.setResizable(false);
         displayUsers();
         displayGroupes();
-        
+
     }
-    
+
     public static ManagerView getInstance() {
         return INSTANCE;
     }
-    
+
     private void displayGroupes() {
         String[] groupes = objectListToStringArray(Manager.getInstance().getGroupes());
         listGroupeView.setListData(groupes);
-        
+
     }
-    
+
     private String[] objectListToStringArray(List<?> liste) {
         String[] result = new String[liste.size()];
         Groupe groupe;
@@ -72,13 +72,13 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
         }
         return result;
     }
-    
+
     private void displayUsers() {
         String[] users = objectListToStringArray(Manager.getInstance().getUsers());
 //        System.out.println("size user " + Manager.getInstance().getUsers().size());
         listUserView.setListData(users);
     }
-    
+
     public void init() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
@@ -277,15 +277,15 @@ public class ManagerView extends javax.swing.JFrame implements Observer {
         if (groupeTxt.getText().equals("") || dureTxt.getText().equals("")) {
             JOptionPane.showMessageDialog(null, "Veuillez complèter tous les champs svp");
         } else {
+
             try {
-                String message = Manager.MSG_NEW_GROUPE + "," + groupeTxt.getText() + "," + usersCombo.getSelectedItem().toString() + "," + dureTxt.getText();
+                int duree = Integer.parseInt(dureTxt.getText());
+                String message = Manager.MSG_NEW_GROUPE + "," + groupeTxt.getText() + "," + usersCombo.getSelectedItem().toString() + "," + duree;
                 channel.basicPublish("", Manager.QUEUE_NAME, null, message.getBytes("UTF-8"));
                 groupeTxt.setText("");
                 dureTxt.setText("");
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(ManagerView.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NumberFormatException | IOException ex) {
+                JOptionPane.showMessageDialog(null, "Durée du groupe incorrecte");
             }
         }
 

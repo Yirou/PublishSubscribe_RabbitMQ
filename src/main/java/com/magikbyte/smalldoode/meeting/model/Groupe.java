@@ -205,4 +205,13 @@ public class Groupe extends Observable {
 
     }
 
+    public void acceptConnexion(Agent user) {
+        user.setOnline(true);
+        user.setCurrentGroupe(this);
+        user.init();
+        user.connectToGroupeTopic();
+        this.getUsers().add(user);
+
+    }
+
 }
