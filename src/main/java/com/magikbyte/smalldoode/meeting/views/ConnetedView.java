@@ -436,7 +436,6 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         } else if (this.groupe.getTimer().isAlive()) {
             timerTxt.setText(this.groupe.getDeadLine() + " s");
         } else {
-//            JOptionPane.showMessageDialog(null, "Fin de proposition de dates");
             disableDateButon();
         }
     }
@@ -457,7 +456,8 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
         StringBuilder msg = new StringBuilder();
         List<String> dateUser;
         String[] column = {"User", "Date1", "Date2", "Date3"};
-        jTable1.setModel(new DefaultTableModel(column, groupe.getDateProposeParLesAgents().size()));
+        System.out.println("Size " + groupe.getUsers().size());
+        jTable1.setModel(new DefaultTableModel(column, groupe.getUsers().size()));
         for (String m : this.groupe.getDateProposeParAdmin()) {
             msg.append(m + " | ");
         }
@@ -475,6 +475,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
 
     private void displayInTable(Agent u, List<String> dateUser) {
         int line = u.getId() - 1;
+        System.out.println("Line " + line);
         jTable1.setValueAt(u.getName(), line, 0);
         for (int i = 0; i < dateUser.size(); i++) {
             jTable1.setValueAt(dateUser.get(i), line, i + 1);
@@ -529,6 +530,7 @@ public class ConnetedView extends javax.swing.JFrame implements Observer {
 @Override
     protected void processWindowEvent(WindowEvent we) {
         if (WindowEvent.WINDOW_CLOSING == we.getID()) {
+            user.sendMsgToTopic("msg," + user.getName() + " a quitté le groupe");
             groupe.deleteObserver(this);
             this.dispose();
             user.logout();
