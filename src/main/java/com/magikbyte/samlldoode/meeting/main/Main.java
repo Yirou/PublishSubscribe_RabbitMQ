@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.belogical.publishsubscribe_rabbitmq.meeting.main;
+package com.magikbyte.samlldoode.meeting.main;
 
-import com.belogical.publishsubscribe_rabbitmq.meeting.Manager;
-import com.belogical.publishsubscribe_rabbitmq.meeting.views.ManagerView;
+import com.magikbyte.samlldoode.meeting.Manager;
+import com.magikbyte.samlldoode.meeting.views.ManagerView;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UnsupportedLookAndFeelException;

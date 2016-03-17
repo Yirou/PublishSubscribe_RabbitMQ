@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.belogical.publishsubscribe_rabbitmq.meeting.utils;
+package com.magikbyte.samlldoode.meeting.utils;
 
-import com.belogical.publishsubscribe_rabbitmq.meeting.Manager;
-import com.belogical.publishsubscribe_rabbitmq.meeting.model.Groupe;
-import com.belogical.publishsubscribe_rabbitmq.meeting.model.Agent;
+import com.magikbyte.samlldoode.meeting.Manager;
+import com.magikbyte.samlldoode.meeting.model.Groupe;
+import com.magikbyte.samlldoode.meeting.model.Agent;
 
 /**
  *

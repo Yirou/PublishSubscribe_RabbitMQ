@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.belogical.publishsubscribe_rabbitmq.meeting.views;
+package com.magikbyte.samlldoode.meeting.views;
 
-import com.belogical.publishsubscribe_rabbitmq.meeting.model.Groupe;
-import com.belogical.publishsubscribe_rabbitmq.meeting.model.Agent;
-import com.belogical.publishsubscribe_rabbitmq.meeting.utils.SearchUtils;
+import com.magikbyte.samlldoode.meeting.model.Groupe;
+import com.magikbyte.samlldoode.meeting.model.Agent;
+import com.magikbyte.samlldoode.meeting.utils.SearchUtils;
 import com.toedter.calendar.JDateChooser;
 import java.awt.FlowLayout;
 import java.awt.event.WindowEvent;

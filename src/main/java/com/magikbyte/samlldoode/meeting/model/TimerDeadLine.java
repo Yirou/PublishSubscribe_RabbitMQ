@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.belogical.publishsubscribe_rabbitmq.meeting.model;
+package com.magikbyte.samlldoode.meeting.model;
 
 import java.util.Observable;
 import java.util.logging.Level;
